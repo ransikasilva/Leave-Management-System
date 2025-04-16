@@ -1,0 +1,122 @@
+<div class="leave-form-container">
+  <div class="page-title-container">
+    <h1 class="page-title">Apply for Leave</h1>
+  </div>
+
+  <mat-card class="form-card">
+    <mat-card-content>
+      <div *ngIf="loadingData" class="loading-state">
+        <mat-progress-spinner diameter="40" mode="indeterminate"></mat-progress-spinner>
+        <p>Loading data...</p>
+      </div>
+
+      <form [formGroup]="leaveForm" (ngSubmit)="onSubmit()" *ngIf="!loadingData">
+        <div class="form-grid">
+          <!-- Leave Type -->
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Leave Type</mat-label>
+            <mat-select formControlName="leaveTypeId">
+              <mat-option *ngFor="let type of leaveTypes" [value]="type.id">
+                {{ type.name }} ({{ getLeaveTypeBalance(type.id!) }} days available)
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="leaveForm.get('leaveTypeId')?.hasError('required') && leaveForm.get('leaveTypeId')?.touched">
+              Leave type is required
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Date Range -->
+          <div class="date-range-fields">
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Start Date</mat-label>
+              <input matInput [matDatepicker]="startPicker" formControlName="startDate" [min]="minDate" (dateChange)="onDateRangeClick()">
+              <mat-datepicker-toggle matIconSuffix [for]="startPicker"></mat-datepicker-toggle>
+              <mat-datepicker #startPicker></mat-datepicker>
+              <mat-error *ngIf="leaveForm.get('startDate')?.hasError('required') && leaveForm.get('startDate')?.touched">
+                Start date is required
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>End Date</mat-label>
+              <input matInput [matDatepicker]="endPicker" formControlName="endDate" [min]="leaveForm.get('startDate')?.value || minDate" (dateChange)="onDateRangeClick()">
+              <mat-datepicker-toggle matIconSuffix [for]="endPicker"></mat-datepicker-toggle>
+              <mat-datepicker #endPicker></mat-datepicker>
+              <mat-error *ngIf="leaveForm.get('endDate')?.hasError('required') && leaveForm.get('endDate')?.touched">
+                End date is required
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <!-- Duration -->
+          <div class="duration-display">
+            <mat-icon>date_range</mat-icon>
+            <span>
+              <ng-container *ngIf="calculatingDuration">Calculating...</ng-container>
+              <ng-container *ngIf="!calculatingDuration">
+                {{ calculatedDuration }} day<ng-container *ngIf="calculatedDuration !== 1">s</ng-container>
+              </ng-container>
+            </span>
+          </div>
+
+          <!-- Half Day Options -->
+          <div class="half-day-options">
+            <mat-checkbox formControlName="halfDay" class="half-day-checkbox">Half Day</mat-checkbox>
+
+            <mat-form-field appearance="outline" class="form-field half-day-type" *ngIf="leaveForm.get('halfDay')?.value">
+              <mat-label>Half Day Type</mat-label>
+              <mat-select formControlName="halfDayType">
+                <mat-option value="FIRST_HALF">First Half</mat-option>
+                <mat-option value="SECOND_HALF">Second Half</mat-option>
+              </mat-select>
+              <mat-error *ngIf="leaveForm.get('halfDayType')?.hasError('required') && leaveForm.get('halfDayType')?.touched">
+                Please select half day type
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <!-- Reason -->
+          <mat-form-field appearance="outline" class="form-field full-width">
+            <mat-label>Reason</mat-label>
+            <textarea matInput formControlName="reason" rows="3" placeholder="Please provide a reason for your leave request"></textarea>
+            <mat-error *ngIf="leaveForm.get('reason')?.hasError('required') && leaveForm.get('reason')?.touched">
+              Reason is required
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Approver -->
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Approver</mat-label>
+            <mat-select formControlName="approverId">
+              <mat-option *ngFor="let manager of managers" [value]="manager.id">
+                {{ manager.firstName }} {{ manager.lastName }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="leaveForm.get('approverId')?.hasError('required') && leaveForm.get('approverId')?.touched">
+              Approver is required
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Contact Details -->
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Contact Details (Optional)</mat-label>
+            <input matInput formControlName="contactDetails" placeholder="Phone number or email where you can be reached">
+          </mat-form-field>
+
+          <!-- Urgent Flag -->
+          <div class="urgent-checkbox-container">
+            <mat-checkbox formControlName="urgent" color="warn">Mark as Urgent</mat-checkbox>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" mat-stroked-button (click)="onReset()" [disabled]="submitting">Reset</button>
+          <button type="submit" mat-raised-button color="primary" [disabled]="submitting || calculatingDuration">
+            <span *ngIf="!submitting">Submit Leave Request</span>
+            <mat-spinner *ngIf="submitting" diameter="24" class="spinner"></mat-spinner>
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

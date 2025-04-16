@@ -1,0 +1,112 @@
+<div class="leave-type-form-container">
+  <div class="page-title-container">
+    <h1 class="page-title">{{ isEditMode ? 'Edit' : 'Create' }} Leave Type</h1>
+    <div class="page-actions">
+      <a routerLink="/leave-types" mat-stroked-button>
+        <mat-icon>arrow_back</mat-icon> Back to Leave Types
+      </a>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Loading data...</p>
+  </div>
+
+  <mat-card *ngIf="!loading" class="form-card">
+    <mat-card-content>
+      <form [formGroup]="leaveTypeForm" (ngSubmit)="onSubmit()">
+        <div class="form-grid">
+          <!-- Name -->
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Leave Type Name</mat-label>
+            <input matInput formControlName="name" placeholder="e.g. Annual Leave">
+            <mat-error *ngIf="leaveTypeForm.get('name')?.hasError('required') && leaveTypeForm.get('name')?.touched">
+              Name is required
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Default Days -->
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Default Days</mat-label>
+            <input matInput type="number" formControlName="defaultDays" min="0">
+            <mat-error *ngIf="leaveTypeForm.get('defaultDays')?.hasError('required') && leaveTypeForm.get('defaultDays')?.touched">
+              Default days is required
+            </mat-error>
+            <mat-error *ngIf="leaveTypeForm.get('defaultDays')?.hasError('min') && leaveTypeForm.get('defaultDays')?.touched">
+              Default days cannot be negative
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Toggles Section -->
+          <div class="toggles-section form-field">
+            <div class="toggle-group">
+              <mat-slide-toggle color="primary" formControlName="paidLeave">
+                Paid Leave
+              </mat-slide-toggle>
+              <span class="toggle-hint">If enabled, this leave type will be considered as paid leave</span>
+            </div>
+
+            <div class="toggle-group">
+              <mat-slide-toggle color="primary" formControlName="requiresApproval">
+                Requires Approval
+              </mat-slide-toggle>
+              <span class="toggle-hint">If enabled, leave requests will require manager approval</span>
+            </div>
+
+            <div class="toggle-group">
+              <mat-slide-toggle color="primary" formControlName="allowHalfDay">
+                Allow Half Day
+              </mat-slide-toggle>
+              <span class="toggle-hint">If enabled, employees can request half-day leaves</span>
+            </div>
+
+            <div class="toggle-group">
+              <mat-slide-toggle color="primary" formControlName="active">
+                Active
+              </mat-slide-toggle>
+              <span class="toggle-hint">If disabled, employees cannot request this leave type</span>
+            </div>
+          </div>
+
+          <!-- Carry Forward -->
+          <div class="carry-forward-section form-field">
+            <div class="toggle-group">
+              <mat-slide-toggle color="primary" formControlName="carryForward">
+                Allow Carry Forward
+              </mat-slide-toggle>
+              <span class="toggle-hint">If enabled, unused leave days can be carried forward to the next year</span>
+            </div>
+
+            <mat-form-field appearance="outline" *ngIf="leaveTypeForm.get('carryForward')?.value" class="max-days-field">
+              <mat-label>Max Carry Forward Days</mat-label>
+              <input matInput type="number" formControlName="maxCarryForwardDays" min="0">
+              <mat-error *ngIf="leaveTypeForm.get('maxCarryForwardDays')?.hasError('required') && leaveTypeForm.get('maxCarryForwardDays')?.touched">
+                Max carry forward days is required
+              </mat-error>
+              <mat-error *ngIf="leaveTypeForm.get('maxCarryForwardDays')?.hasError('min') && leaveTypeForm.get('maxCarryForwardDays')?.touched">
+                Max carry forward days cannot be negative
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <!-- Description -->
+          <mat-form-field appearance="outline" class="form-field full-width">
+            <mat-label>Description</mat-label>
+            <textarea matInput formControlName="description" rows="4" placeholder="Enter a description for this leave type"></textarea>
+          </mat-form-field>
+        </div>
+
+        <mat-divider class="form-divider"></mat-divider>
+
+        <div class="form-actions">
+          <button type="button" mat-stroked-button (click)="onReset()" [disabled]="submitting">Reset</button>
+          <button type="submit" mat-raised-button color="primary" [disabled]="submitting">
+            <span *ngIf="!submitting">{{ isEditMode ? 'Update' : 'Create' }} Leave Type</span>
+            <mat-spinner *ngIf="submitting" diameter="24" class="spinner"></mat-spinner>
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

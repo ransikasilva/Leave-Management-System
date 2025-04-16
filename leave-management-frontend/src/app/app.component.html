@@ -1,0 +1,13 @@
+<div class="app-container" [ngClass]="{'auth-layout': !authService.isLoggedIn}">
+  <app-navbar *ngIf="authService.isLoggedIn"></app-navbar>
+
+  <div class="content-wrapper">
+    <app-sidebar *ngIf="authService.isLoggedIn"></app-sidebar>
+
+    <main class="main-content" [ngClass]="{'auth-content': !authService.isLoggedIn}">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+
+  <app-footer *ngIf="authService.isLoggedIn"></app-footer>
+</div>

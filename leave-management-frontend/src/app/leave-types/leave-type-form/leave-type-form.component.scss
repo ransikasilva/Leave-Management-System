@@ -1,0 +1,108 @@
+.employee-form-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.page-title-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.page-title {
+  font-size: 24px;
+  font-weight: 500;
+  margin: 0;
+  color: #333;
+}
+
+.form-card {
+  margin-bottom: 20px;
+  border-radius: 12px;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 0;
+
+  p {
+    margin-top: 16px;
+    color: #757575;
+  }
+}
+
+mat-card-header {
+  padding: 16px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+mat-card-content {
+  padding: 24px;
+}
+
+.form-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+
+  mat-form-field {
+    flex: 1;
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 0;
+  }
+}
+
+.address-row {
+  .full-width {
+    width: 100%;
+  }
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-top: 16px;
+  margin-bottom: 40px;
+
+  button {
+    min-width: 120px;
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+
+    button {
+      width: 100%;
+    }
+  }
+}
+
+::ng-deep {
+  .mat-mdc-card-title {
+    font-size: 18px !important;
+    font-weight: 500 !important;
+    margin-bottom: 0 !important;
+  }
+
+  .mat-mdc-form-field-subscript-wrapper {
+    height: 20px !important;
+  }
+
+  .mat-mdc-text-field-wrapper {
+    background-color: #f9f9f9 !important;
+  }
+
+  .mdc-text-field--focused .mat-mdc-text-field-wrapper {
+    background-color: #fff !important;
+  }
+}

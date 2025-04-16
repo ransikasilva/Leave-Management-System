@@ -1,0 +1,56 @@
+<div class="team-availability-container">
+  <div *ngIf="loading" class="loading-state">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    <p>Loading team availability...</p>
+  </div>
+
+  <div *ngIf="!loading && error" class="error-state">
+    <mat-icon>error_outline</mat-icon>
+    <p>{{ error }}</p>
+  </div>
+
+  <div *ngIf="!loading && !error && teamMembers.length === 0" class="empty-state">
+    <mat-icon>people_outline</mat-icon>
+    <p>No team members found</p>
+  </div>
+
+  <div *ngIf="!loading && !error && teamMembers.length > 0" class="team-grid">
+    <div *ngFor="let member of teamMembers" class="team-member-card" [ngClass]="member.status">
+      <div class="member-avatar">
+        <div class="avatar-circle">{{ member.avatarText }}</div>
+        <div class="status-indicator"
+             [ngClass]="member.status"
+             [matTooltip]="member.status === 'on-leave' ? 'Currently on leave' :
+                           member.status === 'partial' ? 'Upcoming leave within 7 days' : 'Available'">
+        </div>
+      </div>
+
+      <div class="member-details">
+        <h3 class="member-name">{{ member.name }}</h3>
+        <p class="member-position">{{ member.position }}</p>
+        <p *ngIf="member.department" class="member-department">{{ member.department }}</p>
+      </div>
+
+      <div *ngIf="member.status !== 'available'" class="leave-details">
+        <mat-chip-set>
+          <mat-chip [ngClass]="member.status">
+            {{ member.status === 'on-leave' ? 'On Leave' : 'Upcoming Leave' }}
+          </mat-chip>
+        </mat-chip-set>
+
+        <div *ngIf="member.leaveDetails" class="leave-dates">
+          <mat-icon class="details-icon">event</mat-icon>
+          <span>
+            {{ member.leaveDetails.startDate | dateFormat:'MMM d' }} -
+            {{ member.leaveDetails.endDate | dateFormat:'MMM d, yyyy' }}
+          </span>
+        </div>
+
+        <div *ngIf="member.leaveDetails && member.leaveDetails.reason" class="leave-reason">
+          <mat-icon class="details-icon">comment</mat-icon>
+          <span>{{ member.leaveDetails.reason }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

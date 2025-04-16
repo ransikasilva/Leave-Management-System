@@ -1,0 +1,93 @@
+<div class="register-container">
+  <div class="register-card-wrapper">
+    <mat-card class="register-card">
+      <div class="register-header">
+        <h1 class="app-title">Leave Management</h1>
+        <div class="register-logo">
+          <mat-icon class="logo-icon">assignment_ind</mat-icon>
+        </div>
+        <h2 class="register-title">Create Account</h2>
+        <p class="register-subtitle">Fill in your details to get started</p>
+      </div>
+
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="register-form">
+        <div class="name-fields">
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>First Name</mat-label>
+            <input matInput formControlName="firstName" placeholder="First Name">
+            <mat-error *ngIf="submitted && f['firstName'].errors">
+              First name is required
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Last Name</mat-label>
+            <input matInput formControlName="lastName" placeholder="Last Name">
+            <mat-error *ngIf="submitted && f['lastName'].errors">
+              Last name is required
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Username</mat-label>
+          <input matInput formControlName="username" placeholder="Username" autocomplete="username">
+          <mat-icon matPrefix>person</mat-icon>
+          <mat-error *ngIf="submitted && f['username'].errors">
+            Username is required
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Email</mat-label>
+          <input matInput formControlName="email" placeholder="Email" type="email" autocomplete="email">
+          <mat-icon matPrefix>email</mat-icon>
+          <mat-error *ngIf="submitted && f['email'].errors?.['required']">
+            Email is required
+          </mat-error>
+          <mat-error *ngIf="submitted && f['email'].errors?.['email']">
+            Please enter a valid email address
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Password</mat-label>
+          <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password" placeholder="Password" autocomplete="new-password">
+          <mat-icon matPrefix>lock</mat-icon>
+          <button mat-icon-button matSuffix type="button" (click)="hidePassword = !hidePassword">
+            <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+          </button>
+          <mat-error *ngIf="submitted && f['password'].errors?.['required']">
+            Password is required
+          </mat-error>
+          <mat-error *ngIf="submitted && f['password'].errors?.['minlength']">
+            Password must be at least 6 characters
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Confirm Password</mat-label>
+          <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="confirmPassword" placeholder="Confirm Password" autocomplete="new-password">
+          <mat-icon matPrefix>lock</mat-icon>
+          <mat-error *ngIf="submitted && f['confirmPassword'].errors?.['required']">
+            Please confirm your password
+          </mat-error>
+          <mat-error *ngIf="submitted && f['confirmPassword'].errors?.['passwordMismatch']">
+            Passwords do not match
+          </mat-error>
+        </mat-form-field>
+
+        <div class="form-actions">
+          <button mat-raised-button color="primary" type="submit" [disabled]="loading" class="register-button">
+            <span *ngIf="!loading">Register</span>
+            <mat-spinner *ngIf="loading" diameter="24" class="spinner"></mat-spinner>
+          </button>
+        </div>
+      </form>
+
+      <div class="register-footer">
+        <p>Already have an account? <a routerLink="/auth/login" class="login-link">Sign In</a></p>
+      </div>
+    </mat-card>
+  </div>
+</div>

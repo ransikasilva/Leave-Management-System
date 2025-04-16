@@ -1,0 +1,47 @@
+<div class="sidebar">
+  <div class="sidebar-content">
+    <div class="sidebar-header">
+      <div class="header-logo">
+        <mat-icon class="logo-icon">event_available</mat-icon>
+        <span class="logo-text">Leave Management</span>
+      </div>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <div class="sidebar-menu">
+      <div *ngFor="let item of filteredMenuItems" class="menu-item">
+        <!-- Simple menu item without children -->
+        <a *ngIf="!item.children?.length && item.route"
+           [routerLink]="item.route"
+           routerLinkActive="active-link"
+           class="menu-link">
+          <mat-icon class="menu-icon">{{ item.icon }}</mat-icon>
+          <span class="menu-label">{{ item.label }}</span>
+        </a>
+
+        <!-- Menu item with children (dropdown) -->
+        <mat-expansion-panel *ngIf="item.children?.length"
+                             [expanded]="item.expanded"
+                             class="menu-expansion-panel">
+          <mat-expansion-panel-header class="menu-expansion-header">
+            <mat-panel-title class="menu-panel-title">
+              <mat-icon class="menu-icon">{{ item.icon }}</mat-icon>
+              <span class="menu-label">{{ item.label }}</span>
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+
+          <div class="submenu">
+            <a *ngFor="let child of item.children"
+               [routerLink]="child.route"
+               routerLinkActive="active-link"
+               class="submenu-link">
+              <mat-icon class="submenu-icon">{{ child.icon }}</mat-icon>
+              <span class="submenu-label">{{ child.label }}</span>
+            </a>
+          </div>
+        </mat-expansion-panel>
+      </div>
+    </div>
+  </div>
+</div>

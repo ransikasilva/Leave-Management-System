@@ -1,0 +1,165 @@
+<div class="employee-detail-container">
+  <div class="page-title-container">
+    <h1 class="page-title">Employee Details</h1>
+    <div class="page-actions">
+      <a routerLink="/employees" mat-stroked-button>
+        <mat-icon>arrow_back</mat-icon> Back to Employees
+      </a>
+      <a *ngIf="isAdmin || isHR" [routerLink]="['/employees', employeeId, 'edit']" mat-raised-button color="primary">
+        <mat-icon>edit</mat-icon> Edit Employee
+      </a>
+      <button *ngIf="isAdmin || isHR" mat-raised-button [color]="employee?.active ? 'warn' : 'accent'" (click)="toggleActiveStatus()">
+        <mat-icon>{{ employee?.active ? 'person_off' : 'person' }}</mat-icon>
+        {{ employee?.active ? 'Deactivate' : 'Activate' }}
+      </button>
+      <button *ngIf="isAdmin" mat-raised-button color="warn" (click)="deleteEmployee()">
+        <mat-icon>delete</mat-icon> Delete
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="loading-container">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    <p>Loading employee details...</p>
+  </div>
+
+  <div *ngIf="!loading && employee" class="employee-content">
+    <mat-card class="employee-info-card">
+      <div class="employee-header">
+        <div class="employee-title">
+          <h2>{{ employee.firstName }} {{ employee.lastName }}</h2>
+          <span *ngIf="employee.employeeId" class="employee-id">ID: {{ employee.employeeId }}</span>
+        </div>
+        <span class="status-badge" [ngClass]="{'active': employee.active, 'inactive': !employee.active}">
+          {{ employee.active ? 'Active' : 'Inactive' }}
+        </span>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <div class="employee-details">
+        <div class="detail-row">
+          <div class="detail-label">Email</div>
+          <div class="detail-value">{{ employee.email }}</div>
+        </div>
+
+        <div class="detail-row">
+          <div class="detail-label">Phone</div>
+          <div class="detail-value">{{ employee.phoneNumber || 'Not provided' }}</div>
+        </div>
+
+        <div class="detail-row">
+          <div class="detail-label">Department</div>
+          <div class="detail-value" *ngIf="department">
+            <a [routerLink]="['/departments', department.id]" class="detail-link">
+              {{ department.name }}
+            </a>
+          </div>
+          <div class="detail-value" *ngIf="!department">
+            Not assigned
+          </div>
+        </div>
+
+        <div class="detail-row">
+          <div class="detail-label">Designation</div>
+          <div class="detail-value">{{ employee.designation || 'Not specified' }}</div>
+        </div>
+
+        <div class="detail-row">
+          <div class="detail-label">Manager</div>
+          <div class="detail-value" *ngIf="manager">
+            <a [routerLink]="['/employees', manager.id]" class="detail-link">
+              {{ manager.firstName }} {{ manager.lastName }}
+            </a>
+            <span class="detail-subtitle">{{ manager.designation }}</span>
+          </div>
+          <div class="detail-value" *ngIf="!manager">
+            Not assigned
+          </div>
+        </div>
+
+        <div class="detail-row">
+          <div class="detail-label">Employment Type</div>
+          <div class="detail-value">
+            <span [ngClass]="'employment-type-' + (employee.employmentType?.toLowerCase() || 'fulltime')">
+              {{ employee.employmentType ? (employee.employmentType | titlecase) : 'Full Time' }}
+            </span>
+          </div>
+        </div>
+
+        <div class="detail-row">
+          <div class="detail-label">Joining Date</div>
+          <div class="detail-value">{{ getFormattedDate(employee.joiningDate) }}</div>
+        </div>
+
+        <div class="detail-row" *ngIf="employee.probationEndDate">
+          <div class="detail-label">Probation End</div>
+          <div class="detail-value">{{ getFormattedDate(employee.probationEndDate) }}</div>
+        </div>
+
+        <div class="detail-row" *ngIf="employee.address">
+          <div class="detail-label">Address</div>
+          <div class="detail-value">{{ employee.address }}</div>
+        </div>
+
+        <div class="detail-row" *ngIf="user && (isAdmin || isHR || isSelfProfile)">
+          <div class="detail-label">User Account</div>
+          <div class="detail-value">
+            <div class="user-account-info">
+              <div>
+                <strong>Username:</strong> {{ user.username }}
+              </div>
+              <div *ngIf="user.roles && user.roles.length > 0">
+                <strong>Roles:</strong>
+                <span *ngFor="let role of user.roles" class="user-role">
+                  {{ role.replace('ROLE_', '') }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-card>
+
+    <div *ngIf="subordinates.length > 0" class="subordinates-section">
+      <h3 class="section-title">Team Members ({{ subordinates.length }})</h3>
+
+      <mat-card class="subordinates-card">
+        <table mat-table [dataSource]="subordinates" class="mat-elevation-z0">
+          <!-- Name Column -->
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef> Name </th>
+            <td mat-cell *matCellDef="let employee">
+              {{ employee.firstName }} {{ employee.lastName }}
+            </td>
+          </ng-container>
+
+          <!-- Designation Column -->
+          <ng-container matColumnDef="designation">
+            <th mat-header-cell *matHeaderCellDef> Designation </th>
+            <td mat-cell *matCellDef="let employee"> {{ employee.designation || '-' }} </td>
+          </ng-container>
+
+          <!-- Email Column -->
+          <ng-container matColumnDef="email">
+            <th mat-header-cell *matHeaderCellDef> Email </th>
+            <td mat-cell *matCellDef="let employee"> {{ employee.email }} </td>
+          </ng-container>
+
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef> Actions </th>
+            <td mat-cell *matCellDef="let employee">
+              <a [routerLink]="['/employees', employee.id]" mat-icon-button color="primary" matTooltip="View Employee">
+                <mat-icon>visibility</mat-icon>
+              </a>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+      </mat-card>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,87 @@
+<div class="department-form-container">
+  <div class="page-title-container">
+    <h1 class="page-title">{{ isEditMode ? 'Edit' : 'Create' }} Department</h1>
+    <div class="page-actions">
+      <a routerLink="/departments" mat-stroked-button>
+        <mat-icon>arrow_back</mat-icon> Back to Departments
+      </a>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Loading data...</p>
+  </div>
+
+  <mat-card *ngIf="!loading" class="form-card">
+    <mat-card-content>
+      <form [formGroup]="departmentForm" (ngSubmit)="onSubmit()">
+        <div class="form-grid">
+          <!-- Department Name -->
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Department Name</mat-label>
+            <input matInput formControlName="name" placeholder="Department Name">
+            <mat-error *ngIf="departmentForm.get('name')?.hasError('required') && departmentForm.get('name')?.touched">
+              Department name is required
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Department Code -->
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Department Code</mat-label>
+            <input matInput formControlName="departmentCode" placeholder="Department Code (e.g. HR, IT)">
+          </mat-form-field>
+
+          <!-- Location -->
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Location</mat-label>
+            <input matInput formControlName="location" placeholder="Department Location">
+          </mat-form-field>
+
+          <!-- Department Head -->
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Department Head</mat-label>
+            <mat-select formControlName="headOfDepartmentId">
+              <mat-option [value]="">None</mat-option>
+              <mat-option *ngFor="let employee of employees" [value]="employee.id">
+                {{ employee.firstName }} {{ employee.lastName }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <!-- Parent Department -->
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Parent Department</mat-label>
+            <mat-select formControlName="parentDepartmentId">
+              <mat-option [value]="">None</mat-option>
+              <mat-option *ngFor="let department of filterDepartments()" [value]="department.id">
+                {{ department.name }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <!-- Active Status -->
+          <div class="form-field checkbox-field">
+            <mat-checkbox formControlName="active" color="primary">Active</mat-checkbox>
+          </div>
+
+          <!-- Description -->
+          <mat-form-field appearance="outline" class="form-field full-width">
+            <mat-label>Description</mat-label>
+            <textarea matInput formControlName="description" rows="4" placeholder="Department Description"></textarea>
+          </mat-form-field>
+        </div>
+
+        <mat-divider class="form-divider"></mat-divider>
+
+        <div class="form-actions">
+          <button type="button" mat-stroked-button (click)="onReset()" [disabled]="submitting">Reset</button>
+          <button type="submit" mat-raised-button color="primary" [disabled]="submitting">
+            <span *ngIf="!submitting">{{ isEditMode ? 'Update' : 'Create' }} Department</span>
+            <mat-spinner *ngIf="submitting" diameter="24" class="spinner"></mat-spinner>
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

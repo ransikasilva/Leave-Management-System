@@ -1,0 +1,193 @@
+<div class="employee-form-container">
+  <div class="page-title-container">
+    <h1 class="page-title">{{ isEditMode ? 'Edit Employee' : 'Create Employee' }}</h1>
+    <div class="page-actions">
+      <a routerLink="/employees" mat-stroked-button>
+        <mat-icon>arrow_back</mat-icon> Back to Employees
+      </a>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>{{ isEditMode ? 'Loading employee details...' : 'Loading...' }}</p>
+  </div>
+
+  <form [formGroup]="employeeForm" (ngSubmit)="onSubmit()" *ngIf="!loading">
+    <mat-card class="form-card">
+      <mat-card-header>
+        <mat-card-title>Employee Information</mat-card-title>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>First Name</mat-label>
+            <input matInput formControlName="firstName" placeholder="Enter first name">
+            <mat-error *ngIf="employeeForm.get('firstName')?.hasError('required')">
+              First name is required
+            </mat-error>
+            <mat-error *ngIf="employeeForm.get('firstName')?.hasError('maxlength')">
+              First name must be less than 50 characters
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Last Name</mat-label>
+            <input matInput formControlName="lastName" placeholder="Enter last name">
+            <mat-error *ngIf="employeeForm.get('lastName')?.hasError('required')">
+              Last name is required
+            </mat-error>
+            <mat-error *ngIf="employeeForm.get('lastName')?.hasError('maxlength')">
+              Last name must be less than 50 characters
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Email</mat-label>
+            <input matInput formControlName="email" placeholder="Enter email address" type="email">
+            <mat-error *ngIf="employeeForm.get('email')?.hasError('required')">
+              Email address is required
+            </mat-error>
+            <mat-error *ngIf="employeeForm.get('email')?.hasError('email')">
+              Please enter a valid email address
+            </mat-error>
+            <mat-error *ngIf="employeeForm.get('email')?.hasError('maxlength')">
+              Email must be less than 100 characters
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Phone Number</mat-label>
+            <input matInput formControlName="phoneNumber" placeholder="Enter phone number">
+            <mat-error *ngIf="employeeForm.get('phoneNumber')?.hasError('pattern')">
+              Please enter a valid phone number
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Employee ID</mat-label>
+            <input matInput formControlName="employeeId" placeholder="Enter employee ID">
+            <mat-error *ngIf="employeeForm.get('employeeId')?.hasError('required')">
+              Employee ID is required
+            </mat-error>
+            <mat-error *ngIf="employeeForm.get('employeeId')?.hasError('maxlength')">
+              Employee ID must be less than 20 characters
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>User Account</mat-label>
+            <mat-select formControlName="userId">
+              <mat-option [value]="null">No User Account</mat-option>
+              <mat-option *ngFor="let user of availableUsers" [value]="user.id">
+                {{ user.username }} ({{ user.email }})
+              </mat-option>
+            </mat-select>
+            <mat-hint>Link to an existing user account or leave empty</mat-hint>
+          </mat-form-field>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="form-card">
+      <mat-card-header>
+        <mat-card-title>Employment Details</mat-card-title>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Department</mat-label>
+            <mat-select formControlName="departmentId">
+              <mat-option *ngFor="let department of departments" [value]="department.id">
+                {{ department.name }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="employeeForm.get('departmentId')?.hasError('required')">
+              Department is required
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Designation</mat-label>
+            <input matInput formControlName="designation" placeholder="Enter designation">
+            <mat-error *ngIf="employeeForm.get('designation')?.hasError('maxlength')">
+              Designation must be less than 100 characters
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Manager</mat-label>
+            <mat-select formControlName="managerId">
+              <mat-option [value]="null">No Manager</mat-option>
+              <mat-option *ngFor="let manager of managers" [value]="manager.id">
+                {{ manager.firstName }} {{ manager.lastName }} - {{ manager.designation || 'No Designation' }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Employment Type</mat-label>
+            <mat-select formControlName="employmentType">
+              <mat-option *ngFor="let type of employmentTypes" [value]="type.value">
+                {{ type.label }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="employeeForm.get('employmentType')?.hasError('required')">
+              Employment type is required
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Joining Date</mat-label>
+            <input matInput [matDatepicker]="joiningDatePicker" formControlName="joiningDate">
+            <mat-datepicker-toggle matIconSuffix [for]="joiningDatePicker"></mat-datepicker-toggle>
+            <mat-datepicker #joiningDatePicker></mat-datepicker>
+            <mat-error *ngIf="employeeForm.get('joiningDate')?.hasError('required')">
+              Joining date is required
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Probation End Date</mat-label>
+            <input matInput [matDatepicker]="probationDatePicker" formControlName="probationEndDate">
+            <mat-datepicker-toggle matIconSuffix [for]="probationDatePicker"></mat-datepicker-toggle>
+            <mat-datepicker #probationDatePicker></mat-datepicker>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row address-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Address</mat-label>
+            <textarea matInput formControlName="address" placeholder="Enter address" rows="3"></textarea>
+            <mat-error *ngIf="employeeForm.get('address')?.hasError('maxlength')">
+              Address must be less than 500 characters
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row" *ngIf="isEditMode">
+          <mat-checkbox formControlName="active" color="primary">Active Employee</mat-checkbox>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <div class="form-actions">
+      <button type="button" mat-stroked-button (click)="resetForm()">
+        <mat-icon>refresh</mat-icon> Reset
+      </button>
+      <button type="submit" mat-raised-button color="primary" [disabled]="employeeForm.invalid">
+        <mat-icon>save</mat-icon> {{ isEditMode ? 'Update' : 'Create' }} Employee
+      </button>
+    </div>
+  </form>
+</div>

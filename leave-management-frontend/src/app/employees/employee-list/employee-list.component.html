@@ -1,0 +1,140 @@
+<div class="employee-list-container">
+  <div class="page-title-container">
+    <h1 class="page-title">Employees</h1>
+    <div class="page-actions" *ngIf="isAdmin || isHR">
+      <a routerLink="/employees/create" mat-raised-button color="primary">
+        <mat-icon>add</mat-icon> New Employee
+      </a>
+    </div>
+  </div>
+
+  <mat-card class="filter-card">
+    <div class="filter-container">
+      <mat-form-field appearance="outline">
+        <mat-label>Search</mat-label>
+        <input matInput [(ngModel)]="searchText" (keyup)="applyFilter()" placeholder="Search by name, email, designation, etc.">
+        <button *ngIf="searchText" matSuffix mat-icon-button aria-label="Clear" (click)="searchText=''; applyFilter()">
+          <mat-icon>close</mat-icon>
+        </button>
+        <mat-icon matPrefix>search</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Department</mat-label>
+        <mat-select [(ngModel)]="departmentFilter" (selectionChange)="applyFilter()">
+          <mat-option value="">All Departments</mat-option>
+          <mat-option *ngFor="let department of departments" [value]="department.id">
+            {{ department.name }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Status</mat-label>
+        <mat-select [(ngModel)]="statusFilter" (selectionChange)="applyFilter()">
+          <mat-option value="ALL">All Statuses</mat-option>
+          <mat-option value="ACTIVE">Active</mat-option>
+          <mat-option value="INACTIVE">Inactive</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <button mat-stroked-button (click)="resetFilters()">
+        <mat-icon>clear</mat-icon> Reset Filters
+      </button>
+    </div>
+  </mat-card>
+
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Loading employees...</p>
+  </div>
+
+  <div *ngIf="!loading && dataSource.data.length === 0" class="empty-state">
+    <mat-icon>people_outline</mat-icon>
+    <h3>No Employees Found</h3>
+    <p>There are no employees matching your filters.</p>
+    <a *ngIf="isAdmin || isHR" routerLink="/employees/create" mat-raised-button color="primary">Add Employee</a>
+  </div>
+
+  <mat-card *ngIf="!loading && dataSource.data.length > 0" class="table-card">
+    <div class="table-container">
+      <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z0">
+        <!-- Name Column -->
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="firstName"> Name </th>
+          <td mat-cell *matCellDef="let employee"> {{ employee.firstName }} {{ employee.lastName }} </td>
+        </ng-container>
+
+        <!-- Email Column -->
+        <ng-container matColumnDef="email">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Email </th>
+          <td mat-cell *matCellDef="let employee"> {{ employee.email }} </td>
+        </ng-container>
+
+        <!-- Department Column -->
+        <ng-container matColumnDef="department">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="departmentName"> Department </th>
+          <td mat-cell *matCellDef="let employee"> {{ employee.departmentName }} </td>
+        </ng-container>
+
+        <!-- Designation Column -->
+        <ng-container matColumnDef="designation">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Designation </th>
+          <td mat-cell *matCellDef="let employee"> {{ employee.designation || '-' }} </td>
+        </ng-container>
+
+        <!-- Joining Date Column -->
+        <ng-container matColumnDef="joiningDate">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Joining Date </th>
+          <td mat-cell *matCellDef="let employee"> {{ employee.joiningDate | date:'mediumDate' }} </td>
+        </ng-container>
+
+        <!-- Status Column -->
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="active"> Status </th>
+          <td mat-cell *matCellDef="let employee">
+            <mat-chip-set>
+              <mat-chip [color]="employee.active ? 'primary' : 'warn'"
+                        [ngClass]="getStatusClass(employee.active)">
+                {{ employee.active ? 'Active' : 'Inactive' }}
+              </mat-chip>
+            </mat-chip-set>
+          </td>
+        </ng-container>
+
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef> Actions </th>
+          <td mat-cell *matCellDef="let employee">
+            <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Employee actions">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #menu="matMenu">
+              <a mat-menu-item [routerLink]="['/employees', employee.id]">
+                <mat-icon>visibility</mat-icon>
+                <span>View Details</span>
+              </a>
+              <a mat-menu-item *ngIf="isAdmin || isHR" [routerLink]="['/employees', employee.id, 'edit']">
+                <mat-icon>edit</mat-icon>
+                <span>Edit</span>
+              </a>
+              <button mat-menu-item *ngIf="isAdmin || isHR" (click)="toggleActiveStatus(employee)">
+                <mat-icon>{{ employee.active ? 'person_off' : 'person' }}</mat-icon>
+                <span>{{ employee.active ? 'Deactivate' : 'Activate' }}</span>
+              </button>
+              <button mat-menu-item *ngIf="isAdmin" (click)="deleteEmployee(employee)">
+                <mat-icon>delete</mat-icon>
+                <span>Delete</span>
+              </button>
+            </mat-menu>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;" [routerLink]="['/employees', row.id]" class="employee-row"></tr>
+      </table>
+
+      <mat-paginator [pageSizeOptions]="[10, 25, 50]" showFirstLastButtons></mat-paginator>
+    </div>
+  </mat-card>
+</div>

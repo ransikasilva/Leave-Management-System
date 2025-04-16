@@ -1,0 +1,188 @@
+<div class="dashboard-container">
+  <div class="page-title-container">
+    <h1 class="page-title">Dashboard</h1>
+    <div class="page-actions">
+      <a routerLink="/leaves/apply" mat-raised-button color="primary">
+        <mat-icon>add</mat-icon> Apply for Leave
+      </a>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    <app-stats-widget
+      icon="pending_actions"
+      title="Pending Leaves"
+      [value]="stats.pendingCount"
+      color="#ff9800">
+    </app-stats-widget>
+
+    <app-stats-widget
+      icon="event_available"
+      title="Approved Leaves"
+      [value]="stats.approvedCount"
+      color="#4caf50">
+    </app-stats-widget>
+
+    <app-stats-widget
+      icon="event_busy"
+      title="Rejected Leaves"
+      [value]="stats.rejectedCount"
+      color="#f44336">
+    </app-stats-widget>
+
+    <app-stats-widget
+      *ngIf="isManager || isAdmin || isHR"
+      icon="approval"
+      title="Pending Approvals"
+      [value]="stats.pendingApprovals"
+      color="#2196f3">
+    </app-stats-widget>
+  </div>
+
+  <!-- Leave Balance and Calendar Section -->
+  <div class="dashboard-section">
+    <div class="section-grid">
+      <!-- Leave Balance Card -->
+      <mat-card class="leave-balance-card">
+        <mat-card-header>
+          <mat-card-title>Leave Balance</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div *ngIf="loadingLeaveBalances" class="loading-container">
+            <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+          </div>
+
+          <div *ngIf="!loadingLeaveBalances && leaveBalances.length === 0" class="empty-state">
+            <mat-icon>event_busy</mat-icon>
+            <p>No leave balances found for the current year</p>
+          </div>
+
+          <div *ngIf="!loadingLeaveBalances && leaveBalances.length > 0" class="balance-list">
+            <div *ngFor="let balance of leaveBalances" class="balance-item">
+              <div class="balance-info">
+                <h3 class="balance-type">{{balance.leaveType?.name}}</h3>
+                <div class="balance-progress">
+                  <mat-progress-bar [value]="(balance.used / balance.totalAllocated) * 100" [color]="'primary'"></mat-progress-bar>
+                </div>
+                <div class="balance-details">
+                  <span class="balance-available">{{balance.available}} days available</span>
+                  <span class="balance-total">{{balance.used}} / {{balance.totalAllocated}} days</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+        <mat-card-actions>
+          <a routerLink="/leaves/balance" mat-button color="primary">View All Balances</a>
+        </mat-card-actions>
+      </mat-card>
+
+      <!-- Calendar Card -->
+      <mat-card class="leave-calendar-card">
+        <mat-card-header>
+          <mat-card-title>Team Leave Calendar</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <app-leave-calendar></app-leave-calendar>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+
+  <!-- Pending Leaves and Recent Leaves Section -->
+  <div class="dashboard-section">
+    <div class="section-grid">
+      <!-- Pending Leaves Card -->
+      <mat-card class="leave-list-card">
+        <mat-card-header>
+          <mat-card-title>Pending Leaves</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div *ngIf="loadingPendingLeaves" class="loading-container">
+            <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+          </div>
+
+          <div *ngIf="!loadingPendingLeaves && pendingLeaves.length === 0" class="empty-state">
+            <mat-icon>done_all</mat-icon>
+            <p>No pending leave requests</p>
+          </div>
+
+          <div *ngIf="!loadingPendingLeaves && pendingLeaves.length > 0" class="leave-list">
+            <div *ngFor="let leave of pendingLeaves" class="leave-item">
+              <div class="leave-date">
+                <div class="date-range">
+                  <span class="date-start">{{leave.startDate | dateFormat:'MMM d'}}</span>
+                  <span *ngIf="leave.startDate !== leave.endDate" class="date-separator">-</span>
+                  <span *ngIf="leave.startDate !== leave.endDate" class="date-end">{{leave.endDate | dateFormat:'MMM d, yyyy'}}</span>
+                  <span *ngIf="leave.startDate === leave.endDate" class="date-end">{{leave.startDate | dateFormat:', yyyy'}}</span>
+                </div>
+                <span class="date-duration">{{leave.duration}} day<span *ngIf="leave.duration > 1">s</span></span>
+              </div>
+              <div class="leave-info">
+                <h3 class="leave-type">{{leave.leaveType?.name}}</h3>
+                <p class="leave-reason">{{leave.reason}}</p>
+              </div>
+              <div class="leave-status">
+                <span class="status-badge pending">Pending</span>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+        <mat-card-actions>
+          <a routerLink="/leaves/my-leaves" mat-button color="primary">View All Leaves</a>
+        </mat-card-actions>
+      </mat-card>
+
+      <!-- Recent Leaves Card -->
+      <mat-card class="leave-list-card">
+        <mat-card-header>
+          <mat-card-title>Recent Activity</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div *ngIf="loadingRecentLeaves" class="loading-container">
+            <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+          </div>
+
+          <div *ngIf="!loadingRecentLeaves && recentLeaves.length === 0" class="empty-state">
+            <mat-icon>history</mat-icon>
+            <p>No recent leave activity</p>
+          </div>
+
+          <div *ngIf="!loadingRecentLeaves && recentLeaves.length > 0" class="leave-list">
+            <div *ngFor="let leave of recentLeaves" class="leave-item">
+              <div class="leave-date">
+                <div class="date-range">
+                  <span class="date-start">{{leave.startDate | dateFormat:'MMM d'}}</span>
+                  <span *ngIf="leave.startDate !== leave.endDate" class="date-separator">-</span>
+                  <span *ngIf="leave.startDate !== leave.endDate" class="date-end">{{leave.endDate | dateFormat:'MMM d, yyyy'}}</span>
+                  <span *ngIf="leave.startDate === leave.endDate" class="date-end">{{leave.startDate | dateFormat:', yyyy'}}</span>
+                </div>
+                <span class="date-status">{{leave.createdAt | dateFormat:'MMM d, yyyy'}}</span>
+              </div>
+              <div class="leave-info">
+                <h3 class="leave-type">{{leave.leaveType?.name}}</h3>
+                <p class="leave-reason">{{leave.reason}}</p>
+              </div>
+              <div class="leave-status">
+                <span class="status-badge" [ngClass]="leave.status.toLowerCase()">{{leave.status}}</span>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+
+  <!-- Team Availability Section (Only for managers, HR, admin) -->
+  <div *ngIf="isManager || isAdmin || isHR" class="dashboard-section">
+    <mat-card class="team-availability-card">
+      <mat-card-header>
+        <mat-card-title>Team Availability</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <app-team-availability></app-team-availability>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

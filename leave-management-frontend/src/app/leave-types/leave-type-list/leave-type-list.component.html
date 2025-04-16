@@ -1,0 +1,126 @@
+<div class="leave-type-list-container">
+  <div class="page-title-container">
+    <h1 class="page-title">Leave Types</h1>
+    <div class="page-actions" *ngIf="isAdmin || isHR">
+      <a routerLink="/leave-types/create" mat-raised-button color="primary">
+        <mat-icon>add</mat-icon> New Leave Type
+      </a>
+    </div>
+  </div>
+
+  <mat-card class="filter-card">
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>Search</mat-label>
+      <input matInput [(ngModel)]="searchText" (keyup)="applyFilter()" placeholder="Search by name, description, etc.">
+      <button *ngIf="searchText" matSuffix mat-icon-button aria-label="Clear" (click)="searchText=''; applyFilter()">
+        <mat-icon>close</mat-icon>
+      </button>
+      <mat-icon matPrefix>search</mat-icon>
+    </mat-form-field>
+  </mat-card>
+
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Loading leave types...</p>
+  </div>
+
+  <div *ngIf="!loading && dataSource.data.length === 0" class="empty-state">
+    <mat-icon>category</mat-icon>
+    <h3>No Leave Types Found</h3>
+    <p>There are no leave types in the system yet.</p>
+    <a *ngIf="isAdmin || isHR" routerLink="/leave-types/create" mat-raised-button color="primary">Create Leave Type</a>
+  </div>
+
+  <mat-card *ngIf="!loading && dataSource.data.length > 0" class="table-card">
+    <div class="table-container">
+      <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z0">
+        <!-- Name Column -->
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Name </th>
+          <td mat-cell *matCellDef="let leaveType"> {{ leaveType.name }} </td>
+        </ng-container>
+
+        <!-- Default Days Column -->
+        <ng-container matColumnDef="defaultDays">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Default Days </th>
+          <td mat-cell *matCellDef="let leaveType"> {{ leaveType.defaultDays }} </td>
+        </ng-container>
+
+        <!-- Paid Leave Column -->
+        <ng-container matColumnDef="paidLeave">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Paid </th>
+          <td mat-cell *matCellDef="let leaveType">
+            <mat-icon [matTooltip]="leaveType.paidLeave ? 'Paid Leave' : 'Unpaid Leave'"
+                      [color]="leaveType.paidLeave ? 'primary' : ''">
+              {{ leaveType.paidLeave ? 'check_circle' : 'cancel' }}
+            </mat-icon>
+          </td>
+        </ng-container>
+
+        <!-- Allow Half Day Column -->
+        <ng-container matColumnDef="allowHalfDay">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Half Day </th>
+          <td mat-cell *matCellDef="let leaveType">
+            <mat-icon [matTooltip]="leaveType.allowHalfDay ? 'Allows Half Day' : 'Full Day Only'"
+                      [color]="leaveType.allowHalfDay ? 'primary' : ''">
+              {{ leaveType.allowHalfDay ? 'check_circle' : 'cancel' }}
+            </mat-icon>
+          </td>
+        </ng-container>
+
+        <!-- Requires Approval Column -->
+        <ng-container matColumnDef="requiresApproval">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Approval </th>
+          <td mat-cell *matCellDef="let leaveType">
+            <mat-icon [matTooltip]="leaveType.requiresApproval ? 'Requires Approval' : 'Auto-Approved'"
+                      [color]="leaveType.requiresApproval ? 'primary' : ''">
+              {{ leaveType.requiresApproval ? 'check_circle' : 'cancel' }}
+            </mat-icon>
+          </td>
+        </ng-container>
+
+        <!-- Active Column -->
+        <ng-container matColumnDef="active">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Status </th>
+          <td mat-cell *matCellDef="let leaveType">
+            <mat-chip-set>
+              <mat-chip [color]="leaveType.active ? 'primary' : 'warn'"
+                        [disableRipple]="true">
+                {{ leaveType.active ? 'Active' : 'Inactive' }}
+              </mat-chip>
+            </mat-chip-set>
+          </td>
+        </ng-container>
+
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef> Actions </th>
+          <td mat-cell *matCellDef="let leaveType">
+            <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Leave type actions">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #menu="matMenu">
+              <a mat-menu-item [routerLink]="['/leave-types', leaveType.id, 'edit']" *ngIf="isAdmin || isHR">
+                <mat-icon>edit</mat-icon>
+                <span>Edit</span>
+              </a>
+              <button mat-menu-item *ngIf="isAdmin || isHR" (click)="toggleActive(leaveType)">
+                <mat-icon>{{ leaveType.active ? 'toggle_off' : 'toggle_on' }}</mat-icon>
+                <span>{{ leaveType.active ? 'Deactivate' : 'Activate' }}</span>
+              </button>
+              <button mat-menu-item *ngIf="isAdmin" (click)="deleteLeaveType(leaveType)">
+                <mat-icon>delete</mat-icon>
+                <span>Delete</span>
+              </button>
+            </mat-menu>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="leave-type-row"></tr>
+      </table>
+
+      <mat-paginator [pageSizeOptions]="[10, 25, 50]" showFirstLastButtons></mat-paginator>
+    </div>
+  </mat-card>
+</div>

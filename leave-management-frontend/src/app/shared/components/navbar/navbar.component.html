@@ -1,0 +1,74 @@
+<mat-toolbar class="navbar">
+  <div class="navbar-container">
+    <div class="navbar-brand">
+      <button mat-icon-button class="menu-toggle" aria-label="Toggle side menu">
+        <mat-icon>menu</mat-icon>
+      </button>
+
+      <a routerLink="/dashboard" class="brand-link">
+        <mat-icon class="brand-icon">event_available</mat-icon>
+        <span class="brand-text">Leave Management</span>
+      </a>
+    </div>
+
+    <div class="navbar-actions">
+      <button mat-icon-button class="notification-button" [matBadge]="unreadNotificationCount"
+              [matBadgeHidden]="unreadNotificationCount === 0"
+              matBadgeColor="warn"
+              [matMenuTriggerFor]="notificationMenu">
+        <mat-icon>notifications</mat-icon>
+      </button>
+
+      <mat-menu #notificationMenu="matMenu" class="notification-menu" xPosition="before">
+        <div class="notification-header">
+          <h3 class="notification-title">Notifications</h3>
+          <button mat-button color="primary" (click)="markAllNotificationsAsRead()" *ngIf="unreadNotificationCount > 0">
+            Mark all as read
+          </button>
+        </div>
+
+        <div class="notification-list">
+          <div class="empty-notifications" *ngIf="unreadNotificationCount === 0">
+            <mat-icon>notifications_none</mat-icon>
+            <p>No new notifications</p>
+          </div>
+
+          <!-- Notification items will be shown here -->
+          <!-- This will be implemented in a separate notification component -->
+        </div>
+
+        <div class="notification-footer">
+          <a mat-button routerLink="/notifications" color="primary">View all notifications</a>
+        </div>
+      </mat-menu>
+
+      <button mat-button class="user-menu-button" [matMenuTriggerFor]="userMenu">
+        <div class="user-avatar">
+          {{ currentUser?.firstName?.charAt(0) || '' }}{{ currentUser?.lastName?.charAt(0) || '' }}
+        </div>
+        <span class="user-name">{{ currentUser?.firstName || '' }} {{ currentUser?.lastName || '' }}</span>
+        <mat-icon>keyboard_arrow_down</mat-icon>
+      </button>
+
+      <mat-menu #userMenu="matMenu" class="user-menu" xPosition="before">
+        <a mat-menu-item routerLink="/profile">
+          <mat-icon>account_circle</mat-icon>
+          <span>My Profile</span>
+        </a>
+        <a mat-menu-item routerLink="/leaves">
+          <mat-icon>event_note</mat-icon>
+          <span>My Leaves</span>
+        </a>
+        <a mat-menu-item routerLink="/settings">
+          <mat-icon>settings</mat-icon>
+          <span>Settings</span>
+        </a>
+        <mat-divider></mat-divider>
+        <button mat-menu-item (click)="logout()">
+          <mat-icon>exit_to_app</mat-icon>
+          <span>Logout</span>
+        </button>
+      </mat-menu>
+    </div>
+  </div>
+</mat-toolbar>

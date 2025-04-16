@@ -1,0 +1,132 @@
+.leave-approval-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 0;
+
+  p {
+    margin-top: 16px;
+    color: #757575;
+  }
+}
+
+.approval-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.filter-card {
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.search-field {
+  width: 100%;
+}
+
+.tabs-card {
+  border-radius: 12px;
+  overflow: hidden;
+  padding: 0;
+}
+
+.tab-icon {
+  margin-right: 8px;
+}
+
+.tab-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #3f51b5;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 12px;
+  margin-left: 8px;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 0;
+  color: #757575;
+
+  mat-icon {
+    font-size: 48px;
+    height: 48px;
+    width: 48px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+  }
+
+  h3 {
+    font-size: 18px;
+    font-weight: 500;
+    margin: 0 0 8px 0;
+    color: #333;
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
+.table-container {
+  padding: 16px;
+}
+
+table {
+  width: 100%;
+}
+
+.leave-row {
+  position: relative;
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+  }
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 50px;
+  font-size: 12px;
+  font-weight: 500;
+
+  &.pending {
+    background-color: rgba(255, 152, 0, 0.12);
+    color: #ff9800;
+  }
+
+  &.approved {
+    background-color: rgba(76, 175, 80, 0.12);
+    color: #4caf50;
+  }
+
+  &.rejected {
+    background-color: rgba(244, 67, 54, 0.12);
+    color: #f44336;
+  }
+
+  &.cancelled {
+    background-color: rgba(158, 158, 158, 0.12);
+    color: #9e9e9e;
+  }
+}

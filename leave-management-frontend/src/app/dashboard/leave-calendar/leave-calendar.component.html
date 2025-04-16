@@ -1,0 +1,36 @@
+<div class="calendar-container">
+  <div class="calendar-header">
+    <button mat-icon-button (click)="prevMonth()">
+      <mat-icon>chevron_left</mat-icon>
+    </button>
+    <div class="calendar-title">{{currentMonthName}} {{currentYear}}</div>
+    <button mat-icon-button (click)="nextMonth()">
+      <mat-icon>chevron_right</mat-icon>
+    </button>
+  </div>
+
+  <div class="calendar-weekdays">
+    <div class="weekday" *ngFor="let day of weekdays">{{day}}</div>
+  </div>
+
+  <div class="calendar-days">
+    <div class="day"
+         *ngFor="let day of calendarDays"
+         [ngClass]="{'outside-month': !day.inMonth, 'today': day.isToday}">
+      <div class="day-number">{{day.day}}</div>
+      <div class="day-events">
+        <div class="day-event"
+             *ngFor="let event of day.events"
+             [style.background-color]="event.color"
+             [title]="event.employeeName + ' - ' + event.leaveType">
+          {{event.title}}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="calendar-loading">
+    <mat-icon>sync</mat-icon>
+    <span>Loading calendar data...</span>
+  </div>
+</div>

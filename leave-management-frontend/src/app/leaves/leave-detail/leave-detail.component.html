@@ -1,0 +1,136 @@
+<div class="leave-detail-container">
+  <div class="page-title-container">
+    <h1 class="page-title">Leave Request Details</h1>
+    <div class="page-actions">
+      <a routerLink="/leaves/my-leaves" mat-stroked-button>
+        <mat-icon>arrow_back</mat-icon> Back to List
+      </a>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="loading-container">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    <p>Loading leave request details...</p>
+  </div>
+
+  <div *ngIf="!loading && !leaveRequest" class="error-container">
+    <mat-icon class="error-icon">error_outline</mat-icon>
+    <h2>Leave Request Not Found</h2>
+    <p>The leave request you are looking for does not exist or has been deleted.</p>
+    <a routerLink="/leaves/my-leaves" mat-raised-button color="primary">Back to Leave Requests</a>
+  </div>
+
+  <div *ngIf="!loading && leaveRequest" class="detail-content">
+    <mat-card class="status-card">
+      <div class="status-header">
+        <h2>Leave Request</h2>
+        <span class="status-badge" [ngClass]="getStatusClass(leaveRequest.status!)">
+          {{ leaveRequest.status }}
+        </span>
+      </div>
+
+      <div class="leave-dates">
+        <mat-icon class="date-icon">event</mat-icon>
+        <div class="date-details">
+          <h3>{{ formatDateRange(leaveRequest.startDate, leaveRequest.endDate) }}</h3>
+          <p>{{ leaveRequest.duration }} day<ng-container *ngIf="leaveRequest.duration !== 1">s</ng-container></p>
+        </div>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <div class="leave-actions" *ngIf="canCancel || canApprove || canReject">
+        <button *ngIf="canCancel" mat-raised-button color="warn" (click)="cancelLeave()" [disabled]="loadingAction">
+          <mat-icon>cancel</mat-icon> Cancel Leave
+        </button>
+        <button *ngIf="canApprove" mat-raised-button color="primary" (click)="approveLeave()" [disabled]="loadingAction">
+          <mat-icon>check</mat-icon> Approve
+        </button>
+        <button *ngIf="canReject" mat-raised-button color="warn" (click)="rejectLeave()" [disabled]="loadingAction">
+          <mat-icon>close</mat-icon> Reject
+        </button>
+      </div>
+    </mat-card>
+
+    <div class="detail-cards">
+      <mat-card class="detail-card">
+        <mat-card-header>
+          <mat-icon mat-card-avatar>description</mat-icon>
+          <mat-card-title>Leave Details</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="detail-item">
+            <div class="detail-label">Leave Type</div>
+            <div class="detail-value">{{ leaveType?.name || 'Unknown' }}</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Half Day</div>
+            <div class="detail-value">{{ leaveRequest.halfDay ? 'Yes' : 'No' }}</div>
+          </div>
+          <div class="detail-item" *ngIf="leaveRequest.halfDay">
+            <div class="detail-label">Half Day Type</div>
+            <div class="detail-value">
+              {{ leaveRequest.halfDayType === 'FIRST_HALF' ? 'First Half' : 'Second Half' }}
+            </div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Urgent</div>
+            <div class="detail-value">{{ leaveRequest.urgent ? 'Yes' : 'No' }}</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Reason</div>
+            <div class="detail-value reason-text">{{ leaveRequest.reason }}</div>
+          </div>
+          <div class="detail-item" *ngIf="leaveRequest.contactDetails">
+            <div class="detail-label">Contact Details</div>
+            <div class="detail-value">{{ leaveRequest.contactDetails }}</div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="detail-card">
+        <mat-card-header>
+          <mat-icon mat-card-avatar>history</mat-icon>
+          <mat-card-title>Request Information</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="detail-item">
+            <div class="detail-label">Requested By</div>
+            <div class="detail-value">{{ employee?.firstName }} {{ employee?.lastName }}</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Requested On</div>
+            <div class="detail-value">{{ leaveRequest.createdAt | dateFormat:'MMM d, yyyy, h:mm a' }}</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Approver</div>
+            <div class="detail-value">
+              <ng-container *ngIf="approver">
+                {{ approver.firstName }} {{ approver.lastName }}
+              </ng-container>
+              <ng-container *ngIf="!approver">
+                Not assigned
+              </ng-container>
+            </div>
+          </div>
+          <div class="detail-item" *ngIf="leaveRequest.status === 'APPROVED' || leaveRequest.status === 'REJECTED'">
+            <div class="detail-label">{{ leaveRequest.status === 'APPROVED' ? 'Approved' : 'Rejected' }} On</div>
+            <div class="detail-value">{{ leaveRequest.approvedTime | dateFormat:'MMM d, yyyy, h:mm a' }}</div>
+          </div>
+          <div class="detail-item" *ngIf="leaveRequest.approverComments">
+            <div class="detail-label">Approver Comments</div>
+            <div class="detail-value">{{ leaveRequest.approverComments }}</div>
+          </div>
+          <div class="detail-item" *ngIf="leaveRequest.status === 'CANCELLED'">
+            <div class="detail-label">Cancelled On</div>
+            <div class="detail-value">{{ leaveRequest.cancelledTime | dateFormat:'MMM d, yyyy, h:mm a' }}</div>
+          </div>
+          <div class="detail-item" *ngIf="leaveRequest.cancellationReason">
+            <div class="detail-label">Cancellation Reason</div>
+            <div class="detail-value">{{ leaveRequest.cancellationReason }}</div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</div>

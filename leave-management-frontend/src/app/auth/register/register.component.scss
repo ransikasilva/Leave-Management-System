@@ -1,0 +1,134 @@
+.register-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #3f51b5 0%, #2196f3 100%);
+  padding: 20px;
+}
+
+.register-card-wrapper {
+  width: 100%;
+  max-width: 550px;
+  perspective: 1000px;
+}
+
+.register-card {
+  width: 100%;
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+  padding: 30px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  transform-style: preserve-3d;
+  transition: transform 0.6s;
+
+  &:hover {
+    transform: translateY(-5px);
+  }
+}
+
+.register-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.app-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #3f51b5;
+  margin-bottom: 10px;
+}
+
+.register-logo {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+
+  .logo-icon {
+    font-size: 48px;
+    height: 48px;
+    width: 48px;
+    color: #3f51b5;
+  }
+}
+
+.register-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  background: linear-gradient(45deg, #3f51b5, #2196f3);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.register-subtitle {
+  color: #666;
+  margin-bottom: 16px;
+  font-size: 1rem;
+}
+
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.name-fields {
+  display: flex;
+  gap: 16px;
+
+  @media (max-width: 600px) {
+    flex-direction: column;
+    gap: 0;
+  }
+}
+
+.form-field {
+  width: 100%;
+}
+
+.form-actions {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.register-button {
+  width: 100%;
+  border-radius: 30px;
+  padding: 8px 0;
+  font-size: 16px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+
+  &:not([disabled]):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(63, 81, 181, 0.3);
+  }
+
+  .spinner {
+    margin: 0 auto;
+  }
+}
+
+.register-footer {
+  margin-top: 24px;
+  text-align: center;
+  font-size: 14px;
+  color: #666;
+
+  .login-link {
+    color: #3f51b5;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
+
+    &:hover {
+      color: #1a237e;
+      text-decoration: underline;
+    }
+  }
+}
